@@ -10,6 +10,8 @@ export const searchImagesApi = async (imageName = '') => {
     image_type: 'photo',
     orientation: 'horizontal',
     safesearch: 'true',
+    page: 1,
+    per_page: 15,
   };
   return await axios(PIXABAY_URL, { params });
 };

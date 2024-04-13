@@ -96,10 +96,10 @@ button:focus {
   line-height: 2;
   color: #2e2f42;
 }
-.load-more-btn.hide {
+.load-more-btn.is-hidden {
   display: none;
 }
-.loader.hide {
+.loader.is-hidden {
   display: none;
 }
 .loader {
