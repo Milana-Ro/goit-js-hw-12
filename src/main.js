@@ -15,7 +15,7 @@ const form = document.querySelector('.form');
 
 form.addEventListener('submit', onSubmitForm);
 
-function onSubmitForm(event) {
+async function onSubmitForm(event) {
   event.preventDefault();
   clearGallery();
 
@@ -26,17 +26,21 @@ function onSubmitForm(event) {
     return;
   }
   showLoader();
-  searchImagesApi(imageName)
-    .then(data => {
-      const { hits, total } = data;
-      if (!hits.length || !total) {
-        showNotFoundNotification();
-        return;
-      }
-      renderGallery(hits);
-    })
-    .catch(error => showErrorNotification(error))
-    .finally(() => hideLoader());
+
+  try {
+    const { data } = await searchImagesApi(imageName);
+    const { hits } = data;
+    if (!hits.length) {
+      showNotFoundNotification();
+      return;
+    }
+    renderGallery(hits);
+  } catch (error) {
+    showErrorNotification(error);
+  } finally {
+    hideLoader();
+  }
+
   form.reset();
 }
 
