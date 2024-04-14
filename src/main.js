@@ -15,8 +15,10 @@ import {
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
-let inputValue = '';
+
+const PER_PAGE = 15;
 let page = 1;
+let inputValue = '';
 
 form.addEventListener('submit', onSubmitForm);
 loadMoreButton.addEventListener('click', onClickLoadMoreBtn);
@@ -32,7 +34,7 @@ async function onSubmitForm(event) {
   }
   hideLoadMoreBtn();
   clearGallery();
-  await doRequestProcessing(imageName, page);
+  await doRequestProcessing({ imageName, page, perPage: PER_PAGE });
 
   inputValue = imageName;
   form.reset();
@@ -40,14 +42,14 @@ async function onSubmitForm(event) {
 
 async function onClickLoadMoreBtn() {
   page++;
-  await doRequestProcessing(inputValue, page);
+  await doRequestProcessing({ imageName: inputValue, page, perPage: PER_PAGE });
 }
 
-async function doRequestProcessing(imageName, page) {
+async function doRequestProcessing({ imageName, page, perPage }) {
   showLoader();
 
   try {
-    const { data } = await searchImagesApi(imageName, page);
+    const { data } = await searchImagesApi({ imageName, page, perPage });
     const { hits, totalHits } = data;
     if (!hits.length) {
       showNotFoundNotification();
@@ -57,7 +59,7 @@ async function doRequestProcessing(imageName, page) {
 
     showLoadMoreBtn();
 
-    if (totalHits <= 15) {
+    if (totalHits <= PER_PAGE) {
       hideLoadMoreBtn();
 
       iziToast.info({
