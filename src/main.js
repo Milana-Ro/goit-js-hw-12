@@ -1,8 +1,6 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 import { searchImagesApi } from './js/pixabay-api';
 import {
   clearGallery,
@@ -12,6 +10,7 @@ import {
   loadMoreButton,
   showLoadMoreBtn,
   hideLoadMoreBtn,
+  scrollAfterRender,
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
@@ -43,6 +42,7 @@ async function onSubmitForm(event) {
 async function onClickLoadMoreBtn() {
   page++;
   await doRequestProcessing({ imageName: inputValue, page, perPage: PER_PAGE });
+  scrollAfterRender();
 }
 
 async function doRequestProcessing({ imageName, page, perPage }) {

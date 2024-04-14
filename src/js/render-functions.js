@@ -40,7 +40,6 @@ export const renderGallery = imagesList => {
     return acc;
   }, '');
   galleryContainer.insertAdjacentHTML('beforeend', galleryItemsMarkup);
-
   showImageOnClick();
 };
 
@@ -71,4 +70,10 @@ export const showLoadMoreBtn = () => {
 };
 export const hideLoadMoreBtn = () => {
   loadMoreButton.classList.add('is-hidden');
+};
+
+export const scrollAfterRender = () => {
+  const galleryItem = document.querySelector('.gallery-item');
+  const { height } = galleryItem.getBoundingClientRect();
+  window.scrollBy(0, height * 2);
 };
