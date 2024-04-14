@@ -99,6 +99,9 @@ button:focus {
 .load-more-btn.is-hidden {
   display: none;
 }
+.load-more-btn {
+  margin-block-start: 32px;
+}
 .loader.is-hidden {
   display: none;
 }

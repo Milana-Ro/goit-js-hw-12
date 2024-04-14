@@ -9,31 +9,45 @@ import {
   renderGallery,
   showLoader,
   hideLoader,
+  loadMoreButton,
+  showLoadMoreBtn,
+  hideLoadMoreBtn,
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
-const loadMoreButton = document.querySelector('.load-more-btn');
+let inputValue = '';
+let page = 1;
 
 form.addEventListener('submit', onSubmitForm);
 loadMoreButton.addEventListener('click', onClickLoadMoreBtn);
 
 async function onSubmitForm(event) {
   event.preventDefault();
-  clearGallery();
-
-  //refactoring
-  loadMoreButton.classList.add('is-hidden');
-
+  page = 1;
   const imageName = new FormData(form).get('imageName').trim();
 
   if (!imageName) {
     showRequiredFillNotification();
     return;
   }
+  hideLoadMoreBtn();
+  clearGallery();
+  await doRequestProcessing(imageName, page);
+
+  inputValue = imageName;
+  form.reset();
+}
+
+async function onClickLoadMoreBtn() {
+  page++;
+  await doRequestProcessing(inputValue, page);
+}
+
+async function doRequestProcessing(imageName, page) {
   showLoader();
 
   try {
-    const { data } = await searchImagesApi(imageName);
+    const { data } = await searchImagesApi(imageName, page);
     const { hits, totalHits } = data;
     if (!hits.length) {
       showNotFoundNotification();
@@ -41,13 +55,11 @@ async function onSubmitForm(event) {
     }
     renderGallery(hits);
 
-    //refactoring
-    loadMoreButton.classList.remove('is-hidden');
+    showLoadMoreBtn();
 
     if (totalHits <= 15) {
-      //refactoring
-      loadMoreButton.classList.add('is-hidden');
-      //refactoring
+      hideLoadMoreBtn();
+
       iziToast.info({
         message: "We're sorry, but you've reached the end of search results",
         position: 'topRight',
@@ -59,14 +71,7 @@ async function onSubmitForm(event) {
   } finally {
     hideLoader();
   }
-
-  form.reset();
 }
-
-function onClickLoadMoreBtn() {
-  console.log('click!');
-}
-
 function showErrorNotification(message) {
   iziToast.error({
     title: 'Error',
