@@ -47,6 +47,10 @@ export const clearGallery = () => {
   galleryContainer.innerHTML = '';
 };
 
+export const getGalleryItemsCount = () => {
+  return galleryContainer.childElementCount;
+};
+
 const showImageOnClick = () => {
   const simplelightboxOptions = {
     captionsData: 'alt',
@@ -75,5 +79,8 @@ export const hideLoadMoreBtn = () => {
 export const scrollAfterRender = () => {
   const galleryItem = document.querySelector('.gallery-item');
   const { height } = galleryItem.getBoundingClientRect();
-  window.scrollBy(0, height * 2);
+  window.scrollBy({
+    top: height * 2,
+    behavior: 'smooth',
+  });
 };

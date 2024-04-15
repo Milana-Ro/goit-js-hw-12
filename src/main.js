@@ -11,11 +11,11 @@ import {
   showLoadMoreBtn,
   hideLoadMoreBtn,
   scrollAfterRender,
+  getGalleryItemsCount,
 } from './js/render-functions';
 
 const form = document.querySelector('.form');
 
-const PER_PAGE = 15;
 let page = 1;
 let inputValue = '';
 
@@ -33,7 +33,7 @@ async function onSubmitForm(event) {
   }
   hideLoadMoreBtn();
   clearGallery();
-  await doRequestProcessing({ imageName, page, perPage: PER_PAGE });
+  await doRequestProcessing({ imageName, page });
 
   inputValue = imageName;
   form.reset();
@@ -41,15 +41,15 @@ async function onSubmitForm(event) {
 
 async function onClickLoadMoreBtn() {
   page++;
-  await doRequestProcessing({ imageName: inputValue, page, perPage: PER_PAGE });
+  await doRequestProcessing({ imageName: inputValue, page });
   scrollAfterRender();
 }
 
-async function doRequestProcessing({ imageName, page, perPage }) {
+async function doRequestProcessing({ imageName, page }) {
   showLoader();
 
   try {
-    const { data } = await searchImagesApi({ imageName, page, perPage });
+    const { data } = await searchImagesApi({ imageName, page });
     const { hits, totalHits } = data;
     if (!hits.length) {
       showNotFoundNotification();
@@ -57,17 +57,14 @@ async function doRequestProcessing({ imageName, page, perPage }) {
     }
     renderGallery(hits);
 
-    showLoadMoreBtn();
+    const renderedItemsCount = getGalleryItemsCount();
 
-    if (totalHits <= PER_PAGE) {
+    if (renderedItemsCount >= totalHits) {
       hideLoadMoreBtn();
-
-      iziToast.info({
-        message: "We're sorry, but you've reached the end of search results",
-        position: 'topRight',
-        messageLineHeight: '150%',
-      });
+      showReachEndNotification();
+      return;
     }
+    showLoadMoreBtn();
   } catch (error) {
     showErrorNotification(error);
   } finally {
@@ -96,6 +93,13 @@ function showRequiredFillNotification() {
   iziToast.warning({
     title: 'Caution',
     message: 'Please fill the input',
+    position: 'topRight',
+    messageLineHeight: '150%',
+  });
+}
+function showReachEndNotification() {
+  iziToast.info({
+    message: "We're sorry, but you've reached the end of search results",
     position: 'topRight',
     messageLineHeight: '150%',
   });
